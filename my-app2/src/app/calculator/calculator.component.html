@@ -1,0 +1,46 @@
+<app-navbar></app-navbar>
+<div class="container mt-5 mb-5">
+  <button
+    type="button"
+    class="btn btn-lg btn-outline-primary"
+    (click)="open(mymodal)"
+  >
+    Add Formula
+  </button>
+</div>
+<ng-template #mymodal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Calculator</h4>
+    <button
+      type="button"
+      class="close btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <app-calculator-modal [formulaArr]="formulaArr" (closeModal)="closeModal()"></app-calculator-modal>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-danger"
+      (click)="modal.close('Save click')"
+    >
+      Cancel
+    </button>
+  </div>
+</ng-template>
+<div class="label container mt-2 p-3 pb-0">
+  <h3 class="text-muted mt-3" muted>Formulas</h3>
+</div>
+<div class="container mb-2 p-3 pt-0">
+  <ng-container *ngFor="let formula of formulaArr">
+    <div class="card mt-3 mb-3">
+      <div class="card-body">
+        <h5 class="card-title"><b>Name:</b> {{ formula.name }}</h5>
+        <p class="card-text"><b>Formula:</b> {{ formula.formulaStr }}</p>
+      </div>
+    </div>
+  </ng-container>
+</div>

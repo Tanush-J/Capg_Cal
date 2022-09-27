@@ -1,0 +1,41 @@
+nav {
+  position: relative;
+  top: 0;
+  height: 78px;
+  width: 100%;
+  display: flex;
+  background-color: #2d3142;
+  font-size: 30px;
+  font-weight: 400;
+  align-items: center;
+  .inner {
+    margin: 0 20px;
+    width: 100%;
+    display: flex;
+  }
+  a {
+    text-decoration: none;
+    color: white;
+    margin: 0 10px;
+  }
+  .logo {
+    display: inline;
+    border-right: 2px solid white;
+    a {
+      &:hover {
+        color: rgb(172, 172, 172);
+      }
+    }
+  }
+  .list-items {
+    display: inline;
+    margin-left: auto;
+    margin-right: auto;
+    a {
+      &:hover {
+        color: white;
+        border-bottom: 3px solid white;
+      }
+    }
+  }
+}
