@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import {HttpClientModule} from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +17,7 @@ import { registerLocaleData } from '@angular/common';
 import localeNl from '@angular/common/locales/nl';
 import { CalculatorModalComponent } from './calculator-modal/calculator-modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { UsersService } from './users.service';
 
 registerLocaleData(localeNl);
 
@@ -31,8 +33,8 @@ registerLocaleData(localeNl);
     CalculatorComponent,
     CalculatorModalComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, NgbModule],
-  providers: [],
+  imports: [BrowserModule, AppRoutingModule, FormsModule, NgbModule, HttpClientModule],
+  providers: [UsersService],
   bootstrap: [AppComponent],
 })
 

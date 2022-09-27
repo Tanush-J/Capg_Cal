@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { formula } from '../interfaces/formula';
+import { UsersService } from '../users.service';
 
 @Component({
   selector: 'app-calculator',
@@ -20,6 +21,8 @@ export class CalculatorComponent implements OnInit {
       formulaStr: 'AvgOf(speed)'
     },
   ]
+
+  userList: any;
 
   title = 'appBootstrap';
   closeResult: string = '';
@@ -46,8 +49,15 @@ export class CalculatorComponent implements OnInit {
     this.modalService.dismissAll()
   }
 
-  constructor(private modalService: NgbModal) {}
+  userData(){
+    this.usersService.getUser().subscribe(data => {
+      this.userList = data;
+    })
+  }
 
+  constructor(private modalService: NgbModal, private usersService: UsersService) {}
+  
   ngOnInit(): void {}
+
 }
 
