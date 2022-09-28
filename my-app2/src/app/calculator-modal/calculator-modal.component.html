@@ -11,124 +11,125 @@
         </div>
         <input
           type="text"
-          [ngModel]="formattedTokens"
+          [ngModel]="input"
           class="form-control-sm form-control text-end"
           readonly
         />
 
-        <input
+        <!-- <input
           type="text"
           [ngModel]="input"
           class="form-control form-control-lg text-end"
           readonly
-        />
+        /> -->
 
         <div class="row mt-3">
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="reset()">
+            <button class="btn btn-secondary col-12" (click)="ClearAC()">
               AC
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper('(')">
+            <button class="btn btn-secondary col-12" (click)="Delete()">
+              Del
+            </button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-primary col-12" (click)="Symbols('(')">
               (
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper(')')">
+            <button class="btn btn-primary col-12" (click)="Symbols(')')">
               )
-            </button>
-          </div>
-          <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper('/')">
-              /
             </button>
           </div>
         </div>
         <div class="row mt-3">
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('1')">
+            <button class="btn btn-secondary col-12" (click)="Numbers('1')">
               1
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('2')">
+            <button class="btn btn-secondary col-12" (click)="Numbers('2')">
               2
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('3')">
+            <button class="btn btn-secondary col-12" (click)="Numbers('3')">
               3
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper('*')">
+            <button class="btn btn-primary col-12" (click)="Operators('/')">
+              &div;
+            </button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-3">
+            <button class="btn btn-secondary col-12" (click)="Numbers('4')">
+              4
+            </button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-secondary col-12" (click)="Numbers('5')">
+              5
+            </button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-secondary col-12" (click)="Numbers('6')">
+              6
+            </button>
+          </div>
+          <div class="col-3">
+            <button class="btn btn-primary col-12" (click)="Operators('*')">
               x
             </button>
           </div>
         </div>
         <div class="row mt-3">
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('4')">
-              4
+            <button class="btn btn-secondary col-12" (click)="Numbers('7')">
+              7
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('5')">
-              5
+            <button class="btn btn-secondary col-12" (click)="Numbers('8')">
+              8
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('6')">
-              6
+            <button class="btn btn-secondary col-12" (click)="Numbers('9')">
+              9
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper('+')">
+            <button class="btn btn-primary col-12" (click)="Operators('+')">
               +
             </button>
           </div>
         </div>
         <div class="row mt-3">
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('7')">
-              7
+            <button class="btn btn-secondary col-12" (click)="Operators(',')">
+              ,
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('8')">
-              8
-            </button>
-          </div>
-          <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('9')">
-              9
-            </button>
-          </div>
-          <div class="col-3">
-            <button class="btn btn-primary col-12" (click)="insertOper('-')">
-              -
-            </button>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col-6">
-            <button class="btn btn-secondary col-12" (click)="insertChar('0')">
+            <button class="btn btn-secondary col-12" (click)="Numbers('0')">
               0
             </button>
           </div>
           <div class="col-3">
-            <button class="btn btn-secondary col-12" (click)="insertChar('.')">
+            <button class="btn btn-secondary col-12" (click)="DotOperators('.')">
               .
             </button>
           </div>
           <div class="col-3">
-            <button
-              autofocus
-              class="btn btn-primary col-12"
-              (click)="evaluate()"
-            >
-              Parse
+            <button class="btn btn-primary col-12" (click)="Operators('-')">
+              -
             </button>
           </div>
         </div>
@@ -136,10 +137,10 @@
       <div class="calculator">
         <div class="row">
           <ng-container *ngFor="let func of funcArr">
-            <div class="col-6 mt-2">
+            <div class="col-4 mt-2">
               <button
                 class="btn btn-secondary col-12"
-                (click)="insertFunc(func.insertChar)"
+                (click)="specialFunctions(func.insertChar)"
               >
                 {{ func.name }}
               </button>
@@ -151,7 +152,7 @@
             <div class="col-4 mt-2">
               <button
                 class="btn btn-secondary col-12"
-                (click)="insertChar(vari.name)"
+                (click)="variablesHandling(vari.name)"
               >
                 {{ vari.name }}
               </button>
@@ -161,9 +162,20 @@
         <div class="row mt-3">
           <div class="col">
             <button
+              autofocus
+              class="btn btn-primary col-12"
+              (click)="parseFunction()"
+            >
+              Parse
+            </button>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col">
+            <button
               class="btn btn-success col-12"
-              (click)="save()"
-              [disabled]="isSave"
+              (click)="saveFormula()"
+              [disabled]="!isParsingDone"
             >
               Save
             </button>

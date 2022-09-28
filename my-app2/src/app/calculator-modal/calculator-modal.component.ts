@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import * as math from 'mathjs';
-import { isOperator, Operator } from './operator';
-import { isVar } from './validation';
 import { avaliFunc } from '../interfaces/avaliFunc';
 import { avaliVar } from '../interfaces/avaliVar';
 import { formula } from '../interfaces/formula';
+import { GetTSIService } from '../Services/get-tsi.service';
+import { NotificationService } from '../Services/notification.service';
+import { SyntaxValidationService } from '../Services/syntax-validation.service';
 
 @Component({
   selector: 'app-calculator-modal',
@@ -15,177 +15,247 @@ export class CalculatorModalComponent implements OnInit {
   funcArr: avaliFunc[] = [
     {
       name: 'SumOf ( )',
-      insertChar: 'SumOf'
+      insertChar: 'SumOf('
     },
     {
       name: 'AvgOf ( )',
-      insertChar: 'AvgOf'
+      insertChar: 'AvgOf('
+    },
+    {
+      name: 'tan',
+      insertChar: 'tan('
+    },
+    {
+      name: 'sin',
+      insertChar: 'sin('
+    },
+    {
+      name: 'cos',
+      insertChar: 'cos('
     },
   ]
   varArr: avaliVar[] = [
     {name: 'Time'},
     {name: 'Speed'},
-    {name: 'Prod-cnt'},
-    {name: 'Defect-cnt'},
-    {name: 'Count-in'},
-    {name: 'Count-out'},
+    {name: 'ProdCnt'},
+    {name: 'DefectCnt'},
+    {name: 'CountIn'},
+    {name: 'CountOut'},
   ]
 
-  tokens: string[] = [];
-  result: string[] = this.tokens;
-  showResult = false;
-  isSave = true;
-  isParse = false;
-  funcFlag = false;
-  isEmptyBracket = false;
-
-  formulaName: string = '';
+  tsiValue: any;
 
   @Input() formulaArr: formula[] = {} as formula[];
 
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
 
-  get lastToken(): string {
-    return this.tokens[this.tokens.length - 1];
+  input: string = "";
+  formulaName: string = "";
+  isParsingDone:boolean = false;
+  isDotUsed:boolean = false;
+  
+  // Previous Character CHecking Function 
+  PreviousChar(){
+    this.isParsingDone = false;
+    var prevChar = this.input[this.input.length-1];
+    return prevChar;
   }
 
-  get beforeLastToken(): string {
-    return this.tokens[this.tokens.length - 2];
+  // Clear Input Function
+  ClearAC(){
+    this.input = "";
+    this.isParsingDone = false;
+  }
+  
+  // Erase last input character
+  Delete(){
+    this.input = this.input.slice(0, this.input.length - 1);
   }
 
-  get formattedTokens(): string {
-    if(!this.isParse) return this.tokens.join(' ').replace(/\*/g, 'x') || '0';
-    else return this.result.join(' ').replace(/\*/g, 'x') || '0';
+  // Function For NUmbers
+  Numbers(num: string){
+    if(this.input.length == 0){
+      this.input = this.input + num;
+      return ;
+    }
+    const regex = new RegExp(/[A-Za-z\)\]]/);
+    if(!regex.test(this.PreviousChar())){
+      this.input = this.input + num;
+    }
+    else{
+      this.notifyService.showWarning("Missing Operator (+,-,*,/)");
+    }
   }
 
-  get input(): string {
-    if (this.showResult) {
-      try {
-        // return math.evaluate(this.tokens).toString();
-        return this.tokens.toString();
-      } catch (e) {
-        return 'Something went wrong';
+  // Function For Operators
+  Operators(op: string){
+    if(this.input.length == 0){
+      this.notifyService.showWarning("Add variables and functions to perform operation");
+      return;
+    }
+    const regex = new RegExp(/[,\+\-\*\/]/);
+    if(!regex.test(this.PreviousChar())){
+      this.input = this.input + op;
+      this.isDotUsed = false;
+    }
+    else{
+      this.input = this.input.slice(0,this.input.length-1);
+      this.input = this.input + op;
+    }
+  }
+
+  //Dot Operator
+  DotOperators(dot: string){
+    const regex = new RegExp(/[0-9]/);
+    if(this.input.length == 0 || !regex.test(this.PreviousChar())){
+      this.notifyService.showWarning("Add a number[0-9] before using decimal!");
+      return;
+    }
+    if(this.isDotUsed == false){
+      this.isDotUsed = true;
+      this.input = this.input + dot;
+    }
+    else{
+      this.notifyService.showError("Invalid Expression!");
+    }
+  }
+  
+  // Variables Handling
+  variablesHandling(variable: string){
+    if(this.input.length === 0){
+      this.input = this.input + variable;
+      return;
+    }
+    const regex = new RegExp(/[A-Za-z0-9\]\)]/);
+    if(!regex.test(this.PreviousChar())){
+      this.input = this.input + variable;
+    }
+    else{
+      this.notifyService.showWarning("Missing arithmetic operator or parenthesis!");
+    }
+  }
+
+  // Parenthesis Handling
+  Symbols(sym: string){
+    if(sym === '(' || sym === '['){
+      if(this.input.length === 0){
+        this.input = this.input + sym;
+        return;
+      }
+      const regex = new RegExp(/[A-Za-z0-9\)\]]/);
+      if(regex.test(this.PreviousChar())){
+        this.notifyService.showWarning("Missing arithmetic operator");
+        return;
       }
     }
-
-    return this.tokens
-        .slice()
-        .reverse()
-        .find((t) => !isOperator(t)) || '0';
+    this.input = this.input + sym;
   }
 
-  insertChar(char: string): void{
-    const lastToken = this.lastToken
-    const negNum = lastToken === '-' && isOperator(this.beforeLastToken);
-
-    if(this.isParse){
-      this.reset();
-      this.isParse = false;
+  //Trignometric Fucntions
+  Trignometry(trigo: string){
+    if(this.input.length === 0){
+      this.input = this.input + trigo;
+      return;
     }
-    if (!lastToken || (isOperator(lastToken) && !negNum)) {
-      if (char === '.') {
-        char = '0' + char;
+    const regex = new RegExp(/[A-Za-z0-9\)\]]/);
+    if(!regex.test(this.PreviousChar())){
+      this.input = this.input + trigo;
+    }
+    else{
+      this.notifyService.showWarning("Missing arithmetic operator!");
+    }
+  }
+
+  //Special Functions
+  specialFunctions(func: string){
+    if(this.input.length === 0){
+      this.input = this.input + func;
+      return;
+    }
+    const regex = new RegExp(/[A-Za-z0-9\)\]]/);
+    if(!regex.test(this.PreviousChar())){
+      this.input = this.input + func;
+    }
+    else{
+      this.notifyService.showWarning("Missing arithmetic operator!");
+    }
+  }
+
+  // Single variable checking
+  singleVariableChecking(){
+    const regex = new RegExp(/[A-Za-z\(\)\[\]]/);
+
+    for(let i=0; i < this.input.length; i++){
+      if(!regex.test(this.input[i])){
+        return true;
       }
-      this.tokens.push(char);
-    } else if (this.showResult) {
-      this.tokens = [char];
-    } else if (isVar(this.varArr, char)){
-      this.tokens.push(char);
-    } else {
-      if(isVar(this.varArr, lastToken)){
-        this.tokens.push(char);
-      } else {
-        this.tokens[this.tokens.length - 1] = lastToken + char;
-      }
     }
-    console.log(this.tokens)
-    this.showResult = false;
+    return false;
+  }
+  // Parsing the input string
+  parseFunction(){
+
+    if(this.formulaName.length === 0){
+      this.notifyService.showWarning("Formula Name can't be empty!");
+      return;
+    }
+
+    if(this.input.length != 0 && this.valid.isValid(this.input) && this.singleVariableChecking()){
+      this.isParsingDone = true;
+      this.notifyService.showSuccess("Formula is Correct");
+    }
+    else{
+      this.isParsingDone = false;
+      this.input = "";
+      this.notifyService.showError("Formula is Wrong");
+    }
+
   }
 
-  insertOper(operator: Operator): void {
-    if(this.isParse){
-      this.reset();
-      this.isParse = false;
-    }
-    if (this.showResult) {
-      this.tokens = [(this.tokens).toString()];
-    }
-    if(operator===')'&&this.lastToken==='(') this.isEmptyBracket=true;
-    this.tokens.push(operator);
-    this.showResult = false;
+  // On Save
+  saveFormula(){
+    let formula = { FormulaName: this.formulaName, Formula: this.input };
+
+    this.formulaArr.push(formula);
+    this.isParsingDone = false;
+    this.closeModal.emit();
+    this.writeForm(formula)
+    console.log(this.tsiValue);
   }
 
-  insertFunc(func: string): void {
-    if(this.isParse){
-      this.reset();
-      this.isParse = false;
-    }
-    if(this.lastToken && !isOperator(this.lastToken)) this.funcFlag=true;
-    this.tokens.push(func);
-    this.tokens.push('(')
+  saveFromulaError(){
+    this.notifyService.showWarning("Parse the formula and then click on save button!");
   }
 
-  save(): void {
-    let str = this.result.join(" ");
-    if(!this.formulaName){
-      alert('Enter Formula Name');
-    } else {
-      this.formulaArr.push({name: this.formulaName, formulaStr: str});
-      this.closeModal.emit();
-    }
+  writeForm(formula: formula){
+    let isFormulaSaved: boolean;
+    this.getTSIService.writeFormula(formula).
+    subscribe(data => {
+      console.log(data);
+    });
   }
+ 
+  // getPeople(): Observable<Person[]> {
+  //   console.log('getPeople '+this.baseURL + 'people')
+  //   return this.http.get<Person[]>(this.baseURL + 'people')
+  // }
+  
+  //  refreshPeople() {
+  //   this.apiService.getPeople()
+  //     .subscribe(data => {
+  //       console.log(data)
+  //       this.people=data;
+  //     })
 
-  reset(): void {
-    this.tokens = [];
-    this.result = [];
-    this.isSave = true;
-    this.showResult = false;
-    this.formulaName = '';
-  }
+  constructor(
+    private getTSIService: GetTSIService,
+    private notifyService: NotificationService,
+    private valid: SyntaxValidationService,
+    ) { }
 
-  evaluate(): void {
-    this.result = this.tokens;
-    let str = this.result.join(" ");
-    this.isParse = true;
-
-    for(let i of this.varArr){ 
-      str = str.replaceAll(i.name , "1");
-    }
-    console.log(str)
-    if(this.funcFlag){
-      this.tokens = ['error: invalid Expression'];
-      this.funcFlag = false;
-    } 
-    else if(this.isEmptyBracket){
-      this.tokens = ['error: empty brackets/function'];
-      this.isEmptyBracket = false;
-    }
-    else {
-      try {
-        math.evaluate(str);
-        this.tokens = ['valid Expression']
-        this.isSave = false;
-      } catch (e) {
-        if(e instanceof SyntaxError){
-          this.tokens = ['error: invalid Expression'];
-        } else {
-          this.tokens = ['valid Expression']
-          this.isSave = false;
-        }
-      }
-      // if (!isValid(this.tokens, this.funcArr, this.varArr)) {
-      //   this.tokens = ['invalid Expression'];
-      // } else {
-      //   this.tokens = ['valid Expression']
-      //   this.isSave = false;
-      // }
-    }
-
-    this.showResult = true;
-  }
-
-  constructor() { }
-
-  ngOnInit(): void {}
-
+  ngOnInit(): void {
+    this.getTSIService.getTSI().subscribe(data => {
+    this.tsiValue = data;
+  })}
 }
+

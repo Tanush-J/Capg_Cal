@@ -1,4 +1,4 @@
 export interface formula {
-    name: string,
-    formulaStr: string
+    FormulaName: string,
+    Formula: string
 }

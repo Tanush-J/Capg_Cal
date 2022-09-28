@@ -2,9 +2,14 @@
 @import "~bootswatch/dist/cosmo/variables";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/cosmo/bootswatch";
+@import '~ngx-toastr/toastr';
 
 body {
   margin: 0;
   background-color: whitesmoke;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.toast-container .ngx-toastr{
+  z-index: 1000;
 }
