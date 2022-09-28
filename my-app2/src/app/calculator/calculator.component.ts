@@ -19,6 +19,22 @@ export class CalculatorComponent implements OnInit {
       FormulaName: 'Avg of speed',
       Formula: 'AvgOf(speed)'
     },
+    {
+      FormulaName: 'Distance',
+      Formula: 'Speed*Time'
+    },
+    {
+      FormulaName: 'Force',
+      Formula: 'Mass*Accleration'
+    },
+    {
+      FormulaName: 'Avg of speed',
+      Formula: 'AvgOf(speed)'
+    },
+    {
+      FormulaName: 'Sum of time',
+      Formula: 'SumOf(Time)'
+    },
   ]
 
   userList: any;

@@ -1,6 +1,42 @@
 .calculator {
     display: block;
-    background: #ccc;
+    background: #000000;
     padding: 20px;
-    width: 400px;
+    width: 475px;
+    input {
+        background-color: #CCCCCC;
+        color: #000000;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: large;
+    }
+    button {
+        word-wrap: break-word;
+        font-size: 1rem;
+        color: white;
+    }
+    .btn{
+        background-color: #4D4D4D;
+    }
+    .clr{
+        background-color: #C71E25;
+    }
+    .opr{
+        background-color: #F1A43C;
+    }
+    .func {
+        background-color: #A5A5A5;
+    }
+    .var{
+        background-color: #212121;
+    }
+    .parse{
+        background-color: #2780e3;
+    }
+    .save{
+        background-color: #3fb618;
+    }
+}
+
+.funcRow:nth-child(n+4){
+    margin-top: 1rem;
 }
