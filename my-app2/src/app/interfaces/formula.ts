@@ -1,4 +1,5 @@
 export interface formula {
     FormulaName: string,
-    Formula: string
+    Formula: string,
+    FormulaTokens: string[]
 }

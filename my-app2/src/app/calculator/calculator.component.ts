@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { formula } from '../interfaces/formula';
-
+import { CalculatorModalComponent } from '../calculator-modal/calculator-modal.component';
 @Component({
   selector: 'app-calculator',
   templateUrl: './calculator.component.html',
@@ -12,30 +12,36 @@ import { formula } from '../interfaces/formula';
 export class CalculatorComponent implements OnInit {
   formulaArr: formula[] = [
     {
-      FormulaName: 'Sum of time',
-      Formula: 'SumOf(Time)'
+      FormulaName: 'dummy1',
+      Formula: 'SumOf(Time)',
+      FormulaTokens: []
     },
     {
-      FormulaName: 'Avg of speed',
-      Formula: 'AvgOf(speed)'
+      FormulaName: 'dummy2',
+      Formula: 'AvgOf(speed)',
+      FormulaTokens: []
     },
     {
-      FormulaName: 'Distance',
-      Formula: 'Speed*Time'
+      FormulaName: 'dummy3',
+      Formula: 'Speed*Time',
+      FormulaTokens: []
     },
     {
-      FormulaName: 'Force',
-      Formula: 'Mass*Accleration'
+      FormulaName: 'dummy4',
+      Formula: 'Mass*Accleration',
+      FormulaTokens: []
     },
     {
-      FormulaName: 'Avg of speed',
-      Formula: 'AvgOf(speed)'
+      FormulaName: 'dummy5',
+      Formula: 'AvgOf(speed)',
+      FormulaTokens: []
     },
     {
-      FormulaName: 'Sum of time',
-      Formula: 'SumOf(Time)'
+      FormulaName: 'dummy6',
+      Formula: 'SumOf(Time)',
+      FormulaTokens: []
     },
-  ]
+  ];
 
   userList: any;
 
@@ -49,6 +55,17 @@ export class CalculatorComponent implements OnInit {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   } 
+  // openToEdit(EditFormula: formula){
+  //   const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl',ariaLabelledBy: 'modal-basic-title'});
+
+  //   const data: formula = {
+  //     FormulaName: EditFormula.FormulaName,
+  //     Formula: EditFormula.Formula,
+  //     FormulaTokens: EditFormula.FormulaTokens
+  //   };
+  //   // // const data: formula = EditFormula;
+  //   dialogref.componentInstance.FormulaObject = data;
+  // }
 
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -64,7 +81,18 @@ export class CalculatorComponent implements OnInit {
     this.modalService.dismissAll()
   }
 
-  constructor( private modalService: NgbModal) {}
+  deleteFormula(formulaToDelete: string){
+    const indexOfObject = this.formulaArr.findIndex((object) => {
+      return object.FormulaName == formulaToDelete;
+    })
+    this.formulaArr.splice(indexOfObject, 1);
+  }
+  constructor( private modalService: NgbModal) {
+  }
+
+  submit(){
+    alert("");
+  }
   
   ngOnInit(): void {}
 

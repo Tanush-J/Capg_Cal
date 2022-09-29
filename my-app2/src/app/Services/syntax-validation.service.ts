@@ -14,6 +14,12 @@ export class SyntaxValidationService {
     catch(err: any){
       return false;
     }
+    try{
+      math.evaluate(input);
+    }
+    catch(e){
+      if(e instanceof TypeError) return false;
+    }
     return true;
   } 
 }

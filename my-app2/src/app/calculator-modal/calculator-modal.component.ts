@@ -6,7 +6,7 @@ import { GetTSIService } from '../Services/get-tsi.service';
 import { NotificationService } from '../Services/notification.service';
 import { SyntaxValidationService } from '../Services/syntax-validation.service';
 import { isFunc } from './validation';
-
+// import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 @Component({
   selector: 'app-calculator-modal',
   templateUrl: './calculator-modal.component.html',
@@ -50,40 +50,58 @@ export class CalculatorModalComponent implements OnInit {
       name: 'Sqrt',
       insertChar: 'Sqrt('
     },
-  ]
-  varArr: avaliVar[] = [
-    {name: 'DefectCnt'},
-    {name: 'GoodProd'},
-    {name: 'BadProd'},
-    {name: 'DesignSpeed'},
-    {name: 'AvgSpeed'},
-    {name: 'IsEOLMachine'},
-    {name: 'TotalRunTime'},
-    {name: 'TotalStopTime'},
-    {name: 'IsBNMachine'},
-    {name: 'IsFirstConnectMachine'},
-    {name: 'InputConsumed'},
-    {name: 'OrderInLine'},
-    {name: 'MachineState'},
-  ]
+    {
+      name: 'PercOf',
+      insertChar: 'PercOf('
+    },
+    {
+      name: 'Root',
+      insertChar: 'Root('
+    },
+    {
+      name: 'Inverse',
+      insertChar: 'Inverse('
+    },
+  ];
+
+  varArr: avaliVar[] = [];
 
   tsiValue: any;
   trigoCounter: number=0;
 
   @Input() formulaArr: formula[] = {} as formula[];
-
+  // @Input() public FormulaObject: formula = {} as formula;
   @Output() closeModal: EventEmitter<void> = new EventEmitter<void>();
+
+  constructor(
+    private getTSIService: GetTSIService,
+    private notifyService: NotificationService,
+    private valid: SyntaxValidationService,
+    ) {}
+
+  ngOnInit(): void {
+    this.getTSIService.getTSI().subscribe(
+      (Response: any) => {
+        Response.forEach((data: any) => { 
+          this.varArr.push({name: data});
+       });
+      })
+
+      // console.log(this.FormulaObject);
+      // this.input = this.FormulaObject.Formula;
+      // this.formulaName = this.FormulaObject.FormulaName;
+  }
 
   input: string = "";
   tokens: string[] = [];
   formulaName: string = "";
   isParsingDone:boolean = false;
   isDotUsed:boolean = false;
-  radian: string = "/(360*2*Math.PI)";
+  radian: string = "/(360*2*PI)";
   // Previous Character CHecking Function 
   PreviousChar(){
     this.isParsingDone = false;
-    var prevChar = this.input[this.input.length-1];
+    let prevChar = this.input[this.input.length-1];
     return prevChar;
   }
 
@@ -132,10 +150,8 @@ export class CalculatorModalComponent implements OnInit {
     if(!regex.test(this.PreviousChar())){
       if(numRegex.test(this.PreviousChar()) || this.PreviousChar() === '.'){
         this.tokens[this.tokens.length-1] += num;
-        console.log("appending");
       } else {
         this.tokens.push(num);
-        console.log('in here')
       }
       this.input = this.input + num; 
     }
@@ -162,7 +178,6 @@ export class CalculatorModalComponent implements OnInit {
       this.tokens.pop()
       this.tokens.push(op);
     }
-    console.log(this.tokens);
   }
 
   //Dot Operator
@@ -214,8 +229,19 @@ export class CalculatorModalComponent implements OnInit {
         return;
       }
     }
-    this.input = this.input + sym;
-    this.tokens.push(sym);
+
+    if(sym === ')' || sym === ']'){
+      const regex = new RegExp(/[/(/[]/);
+      if(regex.test(this.PreviousChar())){
+        this.notifyService.showWarning("Missing arithmetic operator");
+        return;
+      }
+      else{
+        this.input = this.input + sym;
+        this.tokens.push(sym);
+      }
+    }
+    
   }
 
   //Special Functions
@@ -238,14 +264,30 @@ export class CalculatorModalComponent implements OnInit {
 
   // Single variable checking
   singleVariableChecking(){
-    const regex = new RegExp(/[A-Za-z]/);
+    let flag = false;
 
+    const regex = new RegExp(/[A-Za-z\(\)]/);
     for(let i=0; i < this.input.length; i++){
-      if(!regex.test(this.input[i])){
-        return true;
+      if(regex.test(this.input[i])){
+        flag =  false;
+      }
+      else{
+        flag =  true;
+        break;
       }
     }
-    return false;
+    
+    const isNum = new RegExp(/^\d$/);
+    for(let i = 0; i < this.input.length; i++){
+      if(isNum.test(this.input[i])){
+        flag = false;
+      }
+      else{
+        flag = true;
+        break;
+      }
+    }
+    return flag;
   }
   // Parsing the input string
   parseFunction(){
@@ -261,7 +303,6 @@ export class CalculatorModalComponent implements OnInit {
     }
     else{
       this.isParsingDone = false;
-      this.input = "";
       this.tokens = [];
       this.notifyService.showError("Formula is Wrong");
     }
@@ -297,16 +338,14 @@ export class CalculatorModalComponent implements OnInit {
   }
   // On Save
   saveFormula(){
-    let formula = { FormulaName: this.formulaName, Formula: this.input };
+    let formula = { FormulaName: this.formulaName, Formula: this.input , FormulaTokens: this.tokens};
     this.formulaArr.push(formula);
     this.DegreeToRadians();
     this.input = this.tokens.join("");
-    let formula2 = { FormulaName: this.formulaName, Formula: this.input };;
+    let formula2 = { FormulaName: this.formulaName, Formula: this.input, FormulaTokens: this.tokens};;
     this.isParsingDone = false;
-    console.log(formula2.Formula);
     this.closeModal.emit();
     this.writeForm(formula2);
-    console.log(this.tsiValue);
   }
 
   saveFromulaError(){
@@ -315,21 +354,15 @@ export class CalculatorModalComponent implements OnInit {
 
   writeForm(formula: formula){
     let isFormulaSaved: boolean;
-    this.getTSIService.writeFormula(formula).
+    let obj = {
+      FormulaName: formula.FormulaName,
+      Formula: formula.Formula
+    }
+    this.getTSIService.writeFormula(obj).
     subscribe(data => {
-      console.log(data);
     });
   }
 
-  constructor(
-    private getTSIService: GetTSIService,
-    private notifyService: NotificationService,
-    private valid: SyntaxValidationService,
-    ) { }
-
-  ngOnInit(): void {
-    this.getTSIService.getTSI().subscribe(data => {
-    this.tsiValue = data;
-  })}
+  
 }
 

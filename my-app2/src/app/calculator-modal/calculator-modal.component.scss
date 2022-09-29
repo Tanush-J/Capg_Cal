@@ -1,39 +1,78 @@
+// $calculator-background: #ccefff;
+// $inputBackground: #f2f2f2;
+// $numpad: #999999;
+// $clrBtn:  #ff3333;
+// $operators: #4da6ff;
+// $functionBtn: #a6a6a6;
+// $variablesBtn:  #8c8c8c;
+// $parseBtn: #0184EC;
+// $saveBtn: #00e600;
+
+$calculator-background: #ffffff;
+$inputBackground: #e6f3ff;
+$numpad: #66b3ff;
+$clrBtn:  #ff3333;
+$operators: #0073e6;
+$functionBtn: #00aaff;
+$variablesBtn:  #4dc3ff;
+$parseBtn: #0184EC;
+$saveBtn: #2eb82e;
+
+// $calculator-background: #D0D0E7;
+// $inputBackground: #1e60b0eb;
+// $numpad: #1e60b0eb;
+// $clrBtn: #C1584B;
+// $operators: #1e60b0eb;
+// $functionBtn: #1e60b0eb;
+// $variablesBtn: #1e60b0eb;
+// $parseBtn: #0184EC;
+// $saveBtn: #47B665;
+
 .calculator {
     display: block;
-    background: #000000;
+    background: $calculator-background;
     padding: 20px;
+    border: 1px solid black;
+    box-shadow: 0px 0px 3px black;
     width: 475px;
     input {
-        background-color: #CCCCCC;
-        color: #000000;
+        background-color: $inputBackground;
+        color: black;
         font-family: 'Courier New', Courier, monospace;
         font-size: large;
+        border: 1px solid black;
+        box-shadow: 0px 0px 3px black;
+        overflow:scroll;
     }
     button {
         word-wrap: break-word;
         font-size: 1rem;
+        font-weight: 400;
         color: white;
+        border: 1px solid black;
+        box-shadow: 0px 0px 3px black;
     }
     .btn{
-        background-color: #4D4D4D;
+        background-color: $numpad;
     }
     .clr{
-        background-color: #C71E25;
+        background-color: $clrBtn;
     }
     .opr{
-        background-color: #F1A43C;
+        background-color: $operators;
     }
     .func {
-        background-color: #A5A5A5;
+        background-color: $functionBtn;
     }
     .var{
-        background-color: #212121;
+        background-color: $variablesBtn;
     }
     .parse{
-        background-color: #2780e3;
+        background-color: $parseBtn;
     }
     .save{
-        background-color: #3fb618;
+        // background-color: #3fb618;
+        background-color: $saveBtn;
     }
 }
 
