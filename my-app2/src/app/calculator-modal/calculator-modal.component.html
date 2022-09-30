@@ -2,7 +2,7 @@
 <div class="container d-flex justify-content-center">
   <div class="calculator">
     <div class="input-group mb-3">
-      <input type="text" class="form-control" placeholder="Formula Name" [(ngModel)]="formulaName" />
+      <input type="text" class="form-control" placeholder="Formula Name" [(ngModel)]="formulaName" [disabled]="isFormulaName"/>
     </div>
     <input type="text" [ngModel]="input" class="form-control-sm form-control text-end" readonly />
     <div class="row mt-3">

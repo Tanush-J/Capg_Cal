@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import {HttpClientModule} from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -13,7 +13,7 @@ import { registerLocaleData } from '@angular/common';
 import localeNl from '@angular/common/locales/nl';
 import { CalculatorModalComponent } from './calculator-modal/calculator-modal.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 registerLocaleData(localeNl);
 
@@ -24,9 +24,9 @@ registerLocaleData(localeNl);
     CalculatorComponent,
     CalculatorModalComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, FormsModule, NgbModule, BrowserAnimationsModule, HttpClientModule, ToastrModule.forRoot()],
+  imports: [BrowserModule, ReactiveFormsModule, AppRoutingModule, FormsModule, NgbModule, BrowserAnimationsModule, HttpClientModule, ToastrModule.forRoot()],
   providers: [],
   bootstrap: [AppComponent],
 })
 
-export class AppModule {}
+export class AppModule { }

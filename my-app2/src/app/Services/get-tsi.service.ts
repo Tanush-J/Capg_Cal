@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { FormArray } from '@angular/forms';
+import { catchError, Observable } from 'rxjs';
 import { BackendFormulaFormat } from '../interfaces/BackendFormulaFormat';
 
 @Injectable({
@@ -17,5 +18,9 @@ export class GetTSIService {
 
   writeFormula(saveFormula: BackendFormulaFormat): Observable<BackendFormulaFormat> {
     return this.http.post<BackendFormulaFormat>('https://dynamickpitesting.azurewebsites.net/api/WriteFormula?code=vsJFbac0eTcnsZODGbe68zVGb2KcdoS7eltrrsj7Op4bAzFuLTMUWg==', saveFormula);
+  }
+
+  selectedFormulaApi(selectedFormula: any){
+    return this.http.post('https://dynamickpicalculation.azurewebsites.net/api/Calculation?code=z6L3fjjAP-Re6q6MUejUDKOoNJzQbY5jhns-SKhkV_bOAzFukhaaQQ==', selectedFormula)
   }
 }

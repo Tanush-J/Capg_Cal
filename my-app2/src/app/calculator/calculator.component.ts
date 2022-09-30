@@ -3,6 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import { formula } from '../interfaces/formula';
 import { CalculatorModalComponent } from '../calculator-modal/calculator-modal.component';
+import { FormGroup, FormBuilder, FormArray, FormControl, } from '@angular/forms';
+import { GetTSIService } from '../Services/get-tsi.service';
+
 @Component({
   selector: 'app-calculator',
   templateUrl: './calculator.component.html',
@@ -14,17 +17,17 @@ export class CalculatorComponent implements OnInit {
     {
       FormulaName: 'dummy1',
       Formula: 'SumOf(Time)',
-      FormulaTokens: []
+      FormulaTokens: ['SumOf(','Time',')']
     },
     {
       FormulaName: 'dummy2',
-      Formula: 'AvgOf(speed)',
-      FormulaTokens: []
+      Formula: 'AvgOf(Speed)',
+      FormulaTokens: ['AvgOf(','Speed',')']
     },
     {
       FormulaName: 'dummy3',
       Formula: 'Speed*Time',
-      FormulaTokens: []
+      FormulaTokens: ['Speed','*','Time']
     },
     {
       FormulaName: 'dummy4',
@@ -47,25 +50,34 @@ export class CalculatorComponent implements OnInit {
 
   title = 'appBootstrap';
   closeResult: string = '';
+  isEditOn: boolean = false;
 
-  open(content:any) {
+  form: FormGroup;
+  selectedFormula: any;
+
+  open(content: any) {
     this.modalService.open(content, {size: 'xl',ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
-  } 
-  // openToEdit(EditFormula: formula){
-  //   const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl',ariaLabelledBy: 'modal-basic-title'});
+  }
 
-  //   const data: formula = {
-  //     FormulaName: EditFormula.FormulaName,
-  //     Formula: EditFormula.Formula,
-  //     FormulaTokens: EditFormula.FormulaTokens
-  //   };
-  //   // // const data: formula = EditFormula;
-  //   dialogref.componentInstance.FormulaObject = data;
-  // }
+  openToEdit(EditFormula: formula){
+    this.isEditOn = true;
+    const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl',ariaLabelledBy: 'modal-basic-title'});
+
+    const data: formula = {
+      FormulaName: EditFormula.FormulaName,
+      Formula: EditFormula.Formula,
+      FormulaTokens: EditFormula.FormulaTokens
+    };
+
+    // // const data: formula = EditFormula;
+    dialogref.componentInstance.FormulaObject = data;
+    dialogref.componentInstance.isEditOn = this.isEditOn;
+    dialogref.componentInstance.formulaArr = this.formulaArr;
+  }
 
   private getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -87,11 +99,34 @@ export class CalculatorComponent implements OnInit {
     })
     this.formulaArr.splice(indexOfObject, 1);
   }
-  constructor( private modalService: NgbModal) {
+  // (<HTMLInputElement>event.target)
+  onCheck(event: any) {
+    this.selectedFormula = (this.form.controls['FormulaName'] as FormArray);
+    if (event.target.checked) {
+      this.selectedFormula.push(new FormControl(event.target.value));
+    } else {
+      const index = this.selectedFormula.controls.findIndex((x: { value: any; }) => x.value === event.target.value);
+      this.selectedFormula.removeAt(index);
+    }
   }
 
-  submit(){
-    alert("");
+  constructor( private modalService: NgbModal, fb: FormBuilder, private getTSIService: GetTSIService,) {
+    this.form = fb.group({
+      FormulaName: new FormArray([])
+    });
+  }
+
+  submit() {
+    interface Formulas {
+      FormulaName: string[]
+    }
+    const data: Formulas = { FormulaName: [] };
+    console.log(this.selectedFormula);
+    this.selectedFormula.value.forEach((str: string) => {
+      data.FormulaName.push(str);
+    })
+    console.log(data);
+    this.getTSIService.selectedFormulaApi(data);
   }
   
   ngOnInit(): void {}
