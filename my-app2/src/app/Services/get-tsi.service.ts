@@ -20,7 +20,7 @@ export class GetTSIService {
     return this.http.post<BackendFormulaFormat>('https://dynamickpitesting.azurewebsites.net/api/WriteFormula?code=vsJFbac0eTcnsZODGbe68zVGb2KcdoS7eltrrsj7Op4bAzFuLTMUWg==', saveFormula);
   }
 
-  selectedFormulaApi(selectedFormula: any){
-    return this.http.post('https://dynamickpicalculation.azurewebsites.net/api/Calculation?code=z6L3fjjAP-Re6q6MUejUDKOoNJzQbY5jhns-SKhkV_bOAzFukhaaQQ==', selectedFormula)
+  selectedFormulaApi(selectedFormula: any): Observable<any> {
+    return this.http.post('https://dynamickpicalculation.azurewebsites.net/api/Calculation?code=z6L3fjjAP-Re6q6MUejUDKOoNJzQbY5jhns-SKhkV_bOAzFukhaaQQ==', selectedFormula);
   }
 }

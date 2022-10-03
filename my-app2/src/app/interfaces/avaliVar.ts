@@ -1,3 +1,3 @@
-export interface avaliVar {
-    name: string,
+export interface AvaliVar {
+    name: string;
 }

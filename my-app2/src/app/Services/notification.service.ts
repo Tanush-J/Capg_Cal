@@ -8,15 +8,15 @@ export class NotificationService {
 
   constructor(private toastrService: ToastrService) { }
 
-  showWarning(msg: string) {
+  showWarning = (msg: string) => {
     this.toastrService.warning(msg);
   }
 
-  showSuccess(msg: string) {
+  showSuccess = (msg: string) => {
     this.toastrService.success(msg);
   }
 
-  showError(msg: string) {
+  showError = (msg: string) => {
     this.toastrService.error(msg);
   }
 }

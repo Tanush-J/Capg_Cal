@@ -1,4 +1,4 @@
-export interface avaliFunc {
-    name: string,
-    insertChar: string
+export interface AvaliFunc {
+    name: string;
+    insertChar: string;
 }

@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import { formula } from '../interfaces/formula';
+import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { Formula } from '../interfaces/formula';
 import { CalculatorModalComponent } from '../calculator-modal/calculator-modal.component';
-import { FormGroup, FormBuilder, FormArray, FormControl, } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, } from '@angular/forms';
 import { GetTSIService } from '../Services/get-tsi.service';
+
+interface Formulas {
+  FormulaName: string[];
+}
 
 @Component({
   selector: 'app-calculator',
@@ -13,21 +17,21 @@ import { GetTSIService } from '../Services/get-tsi.service';
 })
 
 export class CalculatorComponent implements OnInit {
-  formulaArr: formula[] = [
+  formulaArr: Formula[] = [
     {
       FormulaName: 'dummy1',
       Formula: 'SumOf(Time)',
-      FormulaTokens: ['SumOf(','Time',')']
+      FormulaTokens: ['SumOf(', 'Time', ')']
     },
     {
       FormulaName: 'dummy2',
       Formula: 'AvgOf(Speed)',
-      FormulaTokens: ['AvgOf(','Speed',')']
+      FormulaTokens: ['AvgOf(', 'Speed', ')']
     },
     {
       FormulaName: 'dummy3',
       Formula: 'Speed*Time',
-      FormulaTokens: ['Speed','*','Time']
+      FormulaTokens: ['Speed', '*', 'Time']
     },
     {
       FormulaName: 'dummy4',
@@ -47,27 +51,29 @@ export class CalculatorComponent implements OnInit {
   ];
 
   userList: any;
+  calculatedValue: any;
 
   title = 'appBootstrap';
-  closeResult: string = '';
-  isEditOn: boolean = false;
+  closeResult = '';
+  isEditOn = false;
 
   form: FormGroup;
   selectedFormula: any;
+  data: Formulas = {} as Formulas;
 
-  open(content: any) {
-    this.modalService.open(content, {size: 'xl',ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+  open = (content: any): void => {
+    this.modalService.open(content, {size: 'xl', ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
     });
   }
 
-  openToEdit(EditFormula: formula){
+  openToEdit = (EditFormula: Formula, content: any): void => {
     this.isEditOn = true;
-    const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl',ariaLabelledBy: 'modal-basic-title'});
+    const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl', ariaLabelledBy: 'modal-basic-title'});
 
-    const data: formula = {
+    const data: Formula = {
       FormulaName: EditFormula.FormulaName,
       Formula: EditFormula.Formula,
       FormulaTokens: EditFormula.FormulaTokens
@@ -89,18 +95,18 @@ export class CalculatorComponent implements OnInit {
     }
   }
 
-  closeModal(){
-    this.modalService.dismissAll()
+  closeModal = (): void => {
+    this.modalService.dismissAll();
   }
 
-  deleteFormula(formulaToDelete: string){
+  deleteFormula = (formulaToDelete: string): void => {
     const indexOfObject = this.formulaArr.findIndex((object) => {
-      return object.FormulaName == formulaToDelete;
-    })
+      return object.FormulaName === formulaToDelete;
+    });
     this.formulaArr.splice(indexOfObject, 1);
   }
-  // (<HTMLInputElement>event.target)
-  onCheck(event: any) {
+
+  onCheck = (event: any): void => {
     this.selectedFormula = (this.form.controls['FormulaName'] as FormArray);
     if (event.target.checked) {
       this.selectedFormula.push(new FormControl(event.target.value));
@@ -110,25 +116,26 @@ export class CalculatorComponent implements OnInit {
     }
   }
 
-  constructor( private modalService: NgbModal, fb: FormBuilder, private getTSIService: GetTSIService,) {
+  constructor( private modalService: NgbModal, fb: FormBuilder, private getTSIService: GetTSIService) {
     this.form = fb.group({
       FormulaName: new FormArray([])
     });
   }
 
-  submit() {
-    interface Formulas {
-      FormulaName: string[]
-    }
-    const data: Formulas = { FormulaName: [] };
-    console.log(this.selectedFormula);
-    this.selectedFormula.value.forEach((str: string) => {
-      data.FormulaName.push(str);
-    })
-    console.log(data);
-    this.getTSIService.selectedFormulaApi(data);
+  submit = (): void => {
+    this.data = { FormulaName: ['Average'] };
+    // console.log(this.selectedFormula);
+    // this.selectedFormula.value.forEach((str: string) => {
+    //   data.FormulaName.push(str);
+    // })
+
+    this.getTSIService.selectedFormulaApi(this.data).subscribe((result) => {
+      const value = result;
+      if (result) {
+        this.calculatedValue = value.Average;
+      }
+    });
   }
-  
   ngOnInit(): void {}
 
 }

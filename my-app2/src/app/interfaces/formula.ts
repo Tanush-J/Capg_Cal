@@ -1,5 +1,5 @@
-export interface formula {
-    FormulaName: string,
-    Formula: string,
-    FormulaTokens: string[]
+export interface Formula {
+    FormulaName: string;
+    Formula: string;
+    FormulaTokens: string[];
 }

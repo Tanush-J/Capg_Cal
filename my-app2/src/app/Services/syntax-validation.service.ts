@@ -7,19 +7,19 @@ import * as math from 'mathjs';
 export class SyntaxValidationService {
 
   constructor() { }
-  isValid(input: string){
-    try{
+  isValid = (input: string) => {
+    try {
       math.parse(input);
-    }
-    catch(err: any){
+    } catch (err: any) {
       return false;
     }
-    try{
+    try {
       math.evaluate(input);
-    }
-    catch(e){
-      if(e instanceof TypeError) return false;
+    } catch (e) {
+      if (e instanceof TypeError) {
+        return false;
+      }
     }
     return true;
-  } 
+  }
 }

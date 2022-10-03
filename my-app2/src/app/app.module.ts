@@ -24,7 +24,10 @@ registerLocaleData(localeNl);
     CalculatorComponent,
     CalculatorModalComponent,
   ],
-  imports: [BrowserModule, ReactiveFormsModule, AppRoutingModule, FormsModule, NgbModule, BrowserAnimationsModule, HttpClientModule, ToastrModule.forRoot()],
+  imports: [BrowserModule,
+    ReactiveFormsModule, AppRoutingModule, FormsModule, NgbModule,
+    BrowserAnimationsModule, HttpClientModule, ToastrModule.forRoot()
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

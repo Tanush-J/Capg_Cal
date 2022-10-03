@@ -1,17 +1,17 @@
-import { avaliFunc } from "../interfaces/avaliFunc";
-import { avaliVar } from "../interfaces/avaliVar";
+import { AvaliFunc } from '../interfaces/avaliFunc';
+import { AvaliVar } from '../interfaces/avaliVar';
 
-export function isFunc(Arr: avaliFunc[], target: string): boolean{
-    for(let i of Arr){
-        if(i.insertChar === target){
+export function isFunc(Arr: AvaliFunc[], target: string): boolean {
+    for (const i of Arr) {
+        if (i.insertChar === target) {
             return true;
         }
     }
     return false;
 }
-export function isVar(Arr: avaliVar[], target: string): boolean{
-    for(let i of Arr){
-        if(i.name === target){
+export function isVar(Arr: AvaliVar[], target: string): boolean {
+    for (const i of Arr) {
+        if (i.name === target) {
             return true;
         }
     }
