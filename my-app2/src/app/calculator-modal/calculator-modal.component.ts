@@ -8,12 +8,19 @@ import { GetTSIService } from '../Services/get-tsi.service';
 import { NotificationService } from '../Services/notification.service';
 import { SyntaxValidationService } from '../Services/syntax-validation.service';
 import { isFunc, isVar } from './validation';
+import * as $ from 'jquery';
 // import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+
+interface Formulas {
+  FormulaName: string[];
+}
+
 @Component({
   selector: 'app-calculator-modal',
   templateUrl: './calculator-modal.component.html',
   styleUrls: ['./calculator-modal.component.scss']
 })
+
 export class CalculatorModalComponent implements OnInit {
   input = '';
   tokens: string[] = [];
@@ -22,6 +29,8 @@ export class CalculatorModalComponent implements OnInit {
   isDotUsed = false;
   radian = '/(360*2*PI)';
   isFormulaName = false;
+  // data: Formulas = {} as Formulas;
+  isSave = false;
 
   funcArr: AvaliFunc[] = [
     {
@@ -75,6 +84,7 @@ export class CalculatorModalComponent implements OnInit {
   ];
 
   varArr: AvaliVar[] = [];
+  // tslint:disable-next-line: no-non-null-assertion
 
   tsiValue: any;
   trigoCounter = 0;
@@ -104,18 +114,26 @@ export class CalculatorModalComponent implements OnInit {
         this.isFormulaName = true;
       }
   }
+
+  // scrollfix = () => {
+  //   // tslint:disable-next-line: no-non-null-assertion
+  //   const disp = document.getElementById('inputDisplay')!;
+  //   console.warn('inhere');
+  //   disp.scrollLeft = disp.scrollWidth;
+  // }
   // Previous Character CHecking Function
   PreviousChar = () => {
     this.isParsingDone = false;
+    this.isSave = false;
     const prevChar = this.input[this.input.length - 1];
     return prevChar;
   }
-
   // Clear Input Function
   ClearAC = () => {
     this.input = '';
     this.tokens = [];
     this.isParsingDone = false;
+    this.isSave = false;
   }
 
   // Erase last input character
@@ -161,6 +179,15 @@ export class CalculatorModalComponent implements OnInit {
     if (this.PreviousChar() === '.') {
       this.notifyService.showWarning('Missing a number! 0-9');
       return;
+    }
+    if (this.PreviousChar() === '(') {
+      if (op === '-' || op === '+') {
+        this.input = this.input + op;
+        this.tokens.push(op);
+      } else {
+        this.notifyService.showWarning('Invalid Expression');
+        return;
+      }
     }
     const regex = new RegExp(/[,\+\-\*\/]/);
     if (!regex.test(this.PreviousChar())) {
@@ -210,7 +237,7 @@ export class CalculatorModalComponent implements OnInit {
 
   // Parenthesis Handling
   Symbols = (sym: string) => {
-    if (sym === '(' || sym === '[') {
+    if (sym === '(') {
       if (this.input.length === 0) {
         this.input = this.input + sym;
         this.tokens.push(sym);
@@ -227,9 +254,9 @@ export class CalculatorModalComponent implements OnInit {
       }
     }
 
-    if (sym === ')' || sym === ']') {
+    if (sym === ')') {
       const regex = new RegExp(/[/(/[,\+\-\*\/]/);
-      if (regex.test(this.PreviousChar())) {
+      if (this.input.length === 0 || regex.test(this.PreviousChar())) {
         this.notifyService.showWarning('Invalid Expression');
         return;
       } else {
@@ -348,8 +375,8 @@ export class CalculatorModalComponent implements OnInit {
     this.input = this.tokens.join('');
     const formula2 = { FormulaName: this.formulaName, Formula: this.input, FormulaTokens: this.tokens};
     this.isParsingDone = false;
-    this.closeModal();
     this.writeForm(formula2);
+    this.isSave = true;
   }
 
   closeModal = (): void => {
@@ -369,6 +396,19 @@ export class CalculatorModalComponent implements OnInit {
     this.getTSIService.writeFormula(obj)
     .subscribe(data => {
 
+    });
+  }
+
+  // Apply Button
+  getResult = (): void => {
+    const data = { FormulaName: ['Average'] };
+    $('.calculator').find('button').attr('disabled', 'disabled');
+    this.getTSIService.selectedFormulaApi(data).subscribe((result) => {
+      const value = result;
+      if (result) {
+        this.input = value.Average;
+        this.tokens = [];
+      }
     });
   }
 }

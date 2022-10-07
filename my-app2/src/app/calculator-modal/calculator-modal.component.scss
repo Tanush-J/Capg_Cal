@@ -7,6 +7,7 @@
 // $variablesBtn:  #4dc3ff;
 // $parseBtn: #0184EC;
 // $saveBtn: #2eb82e;
+// $applyBtn: #2eb82e;
 
 $calculator-background: #000000;
 $inputBackground: #CCCCCC;
@@ -17,6 +18,7 @@ $functionBtn: #A5A5A5;
 $variablesBtn: #212121;
 $parseBtn: #2780E3;
 $saveBtn: #3FB618;
+$applyBtn: #00a676;
 
 .calculator {
     display: block;
@@ -32,7 +34,6 @@ $saveBtn: #3FB618;
         font-size: large;
         border: 1px solid black;
         box-shadow: 0px 0px 3px black;
-        overflow:scroll;
     }
     button {
         word-wrap: break-word;
@@ -64,8 +65,11 @@ $saveBtn: #3FB618;
         // background-color: #3fb618;
         background-color: $saveBtn;
     }
+    .apply{
+        background-color: $applyBtn;
+    }
 }
 
-.funcRow:nth-child(n+4){
+.funcRow:nth-child(n){
     margin-top: 1rem;
 }
