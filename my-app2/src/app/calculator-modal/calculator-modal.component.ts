@@ -1,19 +1,13 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { of } from 'rxjs';
 import { AvaliFunc } from '../interfaces/avaliFunc';
 import { AvaliVar } from '../interfaces/avaliVar';
 import { Formula } from '../interfaces/formula';
 import { GetTSIService } from '../Services/get-tsi.service';
 import { NotificationService } from '../Services/notification.service';
 import { SyntaxValidationService } from '../Services/syntax-validation.service';
-import { isFunc, isVar } from './validation';
+import { isFunc } from './validation';
 import * as $ from 'jquery';
-// import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-
-interface Formulas {
-  FormulaName: string[];
-}
 
 @Component({
   selector: 'app-calculator-modal',
@@ -29,7 +23,6 @@ export class CalculatorModalComponent implements OnInit {
   isDotUsed = false;
   radian = '/(360*2*PI)';
   isFormulaName = false;
-  // data: Formulas = {} as Formulas;
   isSave = false;
 
   funcArr: AvaliFunc[] = [
@@ -84,8 +77,6 @@ export class CalculatorModalComponent implements OnInit {
   ];
 
   varArr: AvaliVar[] = [];
-  // tslint:disable-next-line: no-non-null-assertion
-
   tsiValue: any;
   trigoCounter = 0;
 
@@ -115,12 +106,13 @@ export class CalculatorModalComponent implements OnInit {
       }
   }
 
-  // scrollfix = () => {
-  //   // tslint:disable-next-line: no-non-null-assertion
-  //   const disp = document.getElementById('inputDisplay')!;
-  //   console.warn('inhere');
-  //   disp.scrollLeft = disp.scrollWidth;
-  // }
+  scrollfix = () => {
+    // tslint:disable-next-line: no-non-null-assertion
+    const disp = document.getElementById('inputDisplay')!;
+    disp.scrollLeft += disp.scrollWidth;
+    console.warn(disp.scrollLeft, disp.scrollWidth);
+  }
+
   // Previous Character CHecking Function
   PreviousChar = () => {
     this.isParsingDone = false;
@@ -168,6 +160,7 @@ export class CalculatorModalComponent implements OnInit {
     } else {
       this.notifyService.showWarning('Missing Operator (+,-,*,/)');
     }
+    this.scrollfix();
   }
 
   // Function For Operators
@@ -199,6 +192,7 @@ export class CalculatorModalComponent implements OnInit {
       this.tokens.push(op);
       this.input = this.tokens.join('');
     }
+    this.scrollfix();
   }
 
   // Dot Operator
@@ -216,7 +210,7 @@ export class CalculatorModalComponent implements OnInit {
     } else {
       this.notifyService.showError('Invalid Expression!');
     }
-
+    this.scrollfix();
   }
   // Variables Handling
   variablesHandling = (variable: string): void => {
@@ -230,6 +224,7 @@ export class CalculatorModalComponent implements OnInit {
     if (!regex.test(this.PreviousChar())) {
       this.input = this.input + variable;
       this.tokens.push(variable);
+      this.scrollfix();
     } else {
       this.notifyService.showWarning('Missing arithmetic operator or parenthesis!');
     }
@@ -251,6 +246,7 @@ export class CalculatorModalComponent implements OnInit {
       } else {
         this.input = this.input + sym;
         this.tokens.push(sym);
+        this.scrollfix();
       }
     }
 
@@ -262,6 +258,7 @@ export class CalculatorModalComponent implements OnInit {
       } else {
         this.input = this.input + sym;
         this.tokens.push(sym);
+        this.scrollfix();
       }
     }
   }
@@ -281,6 +278,7 @@ export class CalculatorModalComponent implements OnInit {
     } else {
       this.notifyService.showWarning('Missing arithmetic operator!');
     }
+    this.scrollfix();
   }
 
   // Single variable checking
@@ -380,6 +378,7 @@ export class CalculatorModalComponent implements OnInit {
   }
 
   closeModal = (): void => {
+    this.notifyService.dismissToastrs();
     this.modalService.dismissAll();
   }
 
@@ -395,7 +394,7 @@ export class CalculatorModalComponent implements OnInit {
     };
     this.getTSIService.writeFormula(obj)
     .subscribe(data => {
-
+      this.notifyService.showHttpResponse(data);
     });
   }
 

@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 
-import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Formula } from '../interfaces/formula';
 import { CalculatorModalComponent } from '../calculator-modal/calculator-modal.component';
 import { FormArray, FormBuilder, FormControl, FormGroup, } from '@angular/forms';
 import { GetTSIService } from '../Services/get-tsi.service';
+import { NotificationService } from '../Services/notification.service';
 
 interface Formulas {
   FormulaName: string[];
@@ -62,7 +63,7 @@ export class CalculatorComponent implements OnInit {
   data: Formulas = {} as Formulas;
 
   open = (content: any): void => {
-    this.modalService.open(content, {size: 'xl', ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+    this.modalService.open(content, { size: 'xl', ariaLabelledBy: 'modal-basic-title' }).result.then((result) => {
       this.closeResult = `Closed with: ${result}`;
     }, (reason) => {
       this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
@@ -71,7 +72,7 @@ export class CalculatorComponent implements OnInit {
 
   openToEdit = (EditFormula: Formula, content: any): void => {
     this.isEditOn = true;
-    const dialogref = this.modalService.open(CalculatorModalComponent, {size: 'xl', ariaLabelledBy: 'modal-basic-title'});
+    const dialogref = this.modalService.open(CalculatorModalComponent, { size: 'xl', ariaLabelledBy: 'modal-basic-title' });
 
     const data: Formula = {
       FormulaName: EditFormula.FormulaName,
@@ -86,17 +87,18 @@ export class CalculatorComponent implements OnInit {
   }
 
   private getDismissReason(reason: any): string {
+    this.closeToastr();
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 
-  closeModal = (): void => {
-    this.modalService.dismissAll();
+  closeToastr = (): void => {
+    this.notifyService.dismissToastrs();
   }
 
   deleteFormula = (formulaToDelete: string): void => {
@@ -116,7 +118,11 @@ export class CalculatorComponent implements OnInit {
     }
   }
 
-  constructor( private modalService: NgbModal, fb: FormBuilder, private getTSIService: GetTSIService) {
+  constructor(
+    private modalService: NgbModal,
+    fb: FormBuilder,
+    private getTSIService: GetTSIService,
+    private notifyService: NotificationService) {
     this.form = fb.group({
       FormulaName: new FormArray([])
     });

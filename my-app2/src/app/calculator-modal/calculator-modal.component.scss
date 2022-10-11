@@ -62,14 +62,9 @@ $applyBtn: #00a676;
         background-color: $parseBtn;
     }
     .save{
-        // background-color: #3fb618;
         background-color: $saveBtn;
     }
     .apply{
         background-color: $applyBtn;
     }
-}
-
-.funcRow:nth-child(n){
-    margin-top: 1rem;
 }

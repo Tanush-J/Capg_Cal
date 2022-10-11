@@ -7,11 +7,11 @@
 <ng-template #mymodal let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Calculator</h4>
-    <button type="button" class="close btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    <button type="button" class="close btn-close" aria-label="Close" (click)="modal.dismiss('Cross click'); closeToastr();"></button>
   </div>
     <app-calculator-modal [formulaArr]="formulaArr"></app-calculator-modal>
   <div class="modal-footer">
-    <button type="button" class="btn btn-danger" (click)="modal.close('Save click')">
+    <button type="button" class="btn btn-danger" (click)="modal.close('Cancel click'); closeToastr();">
       Cancel
     </button>
   </div>
