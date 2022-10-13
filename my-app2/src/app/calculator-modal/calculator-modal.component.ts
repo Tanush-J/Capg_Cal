@@ -109,7 +109,8 @@ export class CalculatorModalComponent implements OnInit {
   scrollfix = () => {
     // tslint:disable-next-line: no-non-null-assertion
     const disp = document.getElementById('inputDisplay')!;
-    disp.scrollLeft += disp.scrollWidth;
+    // disp.focus();
+    disp.scrollLeft += disp.scrollWidth ;
     console.warn(disp.scrollLeft, disp.scrollWidth);
   }
 
@@ -137,6 +138,7 @@ export class CalculatorModalComponent implements OnInit {
       this.tokens.pop();
       this.input = this.tokens.join('');
     }
+    this.scrollfix();
   }
 
   // Function For NUmbers

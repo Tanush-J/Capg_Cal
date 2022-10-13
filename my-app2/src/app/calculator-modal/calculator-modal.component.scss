@@ -27,6 +27,7 @@ $applyBtn: #00a676;
     border: 1px solid black;
     box-shadow: 0px 0px 3px black;
     width: 475px;
+    max-height: 37rem;
     input {
         background-color: $inputBackground;
         color: black;
@@ -57,6 +58,9 @@ $applyBtn: #00a676;
     }
     .var{
         background-color: $variablesBtn;
+        :nth-child(n+4){
+            margin-top: 1rem;
+        }
     }
     .parse{
         background-color: $parseBtn;
@@ -68,3 +72,22 @@ $applyBtn: #00a676;
         background-color: $applyBtn;
     }
 }
+
+#ParameterBoxID {
+    height: 400px;
+    // width: 80%;
+    // background-color: #00a676;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgb(28, 28, 28);
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+  }

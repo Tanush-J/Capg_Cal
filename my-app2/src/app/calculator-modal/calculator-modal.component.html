@@ -153,14 +153,16 @@
           </button>
         </div>
       </div>
-      <div class="row">
-        <ng-container *ngFor="let vari of varArr">
-          <div class="col-4 mt-3">
-            <button class="var btn col-12" (click)="variablesHandling(vari.name)">
-              {{ vari.name }}
-            </button>
-          </div>
-        </ng-container>
+      <div id="ParameterBoxID" class="overflow-auto mt-3">
+        <div class="row">
+          <ng-container *ngFor="let vari of varArr">
+            <div class="col-4">
+              <button class="var btn col-12" (click)="variablesHandling(vari.name)">
+                {{ vari.name }}
+              </button>
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
   </div>
