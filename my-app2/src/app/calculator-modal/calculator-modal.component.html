@@ -10,7 +10,7 @@
         <input type="text" class="form-control" placeholder="Formula Name" [(ngModel)]="formulaName"
           [disabled]="isFormulaName" />
       </div>
-      <input id="inputDisplay" type="text" [ngModel]="input" class="form-control-sm form-control text-end" readonly/>
+      <input id="inputDisplay" type="text" [ngModel]="input" class="form-control-sm form-control text-end" readonly />
       <div class="row mt-3">
         <div class="col-3">
           <button class="clr btn col-12" (click)="ClearAC()">
@@ -101,7 +101,7 @@
       </div>
       <div class="row mt-3">
         <div class="col-3">
-          <button class="btn col-12" (click)="Operators(',')">
+          <button class="btn col-12" (click)="Operators(',')" disabled>
             ,
           </button>
         </div>
@@ -132,7 +132,17 @@
       </div>
     </div>
     <div class="calculator">
-      <div class="row">
+      <div class="row form-group">
+        <div class="col-6">
+          <label for="sdate" class="col-form-label pt-0">Start Frame</label>
+          <input id="sdate" class="form-control p-1" [(ngModel)]="startDateTime" type="datetime-local" />
+        </div>
+        <div class="col-6">
+          <label for="edate" class="col-form-label pt-0">End Frame</label>
+          <input id="edate" class="form-control p-1" [(ngModel)]="endDateTime" type="datetime-local" />
+        </div>
+      </div>
+      <div class="row mt-3">
         <div class="col">
           <button autofocus class="parse btn col-12" (click)="parseFunction()">
             Parse
@@ -145,22 +155,22 @@
             Save
           </button>
         </div>
-      </div>
-      <div class="row mt-3">
         <div class="col">
           <button class="apply btn col-12" (click)="getResult()" [disabled]="!isSave">
             Apply
           </button>
         </div>
       </div>
-      <div class="row">
-        <ng-container *ngFor="let vari of varArr">
-          <div class="col-4 mt-3">
-            <button class="var btn col-12" (click)="variablesHandling(vari.name)">
-              {{ vari.name }}
-            </button>
-          </div>
-        </ng-container>
+      <div id="ParameterBoxID" class="overflow-auto mt-3">
+        <div class="row">
+          <ng-container *ngFor="let vari of varArr">
+            <div id="varBtnSpace" class="col-4">
+              <button class="var btn col-12" (click)="variablesHandling(vari.name)">
+                {{ vari.name }}
+              </button>
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
   </div>

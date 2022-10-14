@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { AvaliFunc } from '../interfaces/avaliFunc';
 import { AvaliVar } from '../interfaces/avaliVar';
 import { Formula } from '../interfaces/formula';
@@ -79,6 +79,8 @@ export class CalculatorModalComponent implements OnInit {
   varArr: AvaliVar[] = [];
   tsiValue: any;
   trigoCounter = 0;
+  startDateTime: any;
+  endDateTime: any;
 
   @Input() formulaArr: Formula[] = {} as Formula[];
   @Input() public FormulaObject: Formula = {} as Formula;
@@ -109,7 +111,8 @@ export class CalculatorModalComponent implements OnInit {
   scrollfix = () => {
     // tslint:disable-next-line: no-non-null-assertion
     const disp = document.getElementById('inputDisplay')!;
-    disp.scrollLeft += disp.scrollWidth;
+    // disp.focus();
+    disp.scrollLeft += disp.scrollWidth ;
     console.warn(disp.scrollLeft, disp.scrollWidth);
   }
 
@@ -137,6 +140,7 @@ export class CalculatorModalComponent implements OnInit {
       this.tokens.pop();
       this.input = this.tokens.join('');
     }
+    this.scrollfix();
   }
 
   // Function For NUmbers
@@ -215,18 +219,26 @@ export class CalculatorModalComponent implements OnInit {
   // Variables Handling
   variablesHandling = (variable: string): void => {
     if (this.input.length === 0) {
-      this.tokens.push(variable);
-      this.input = this.tokens.join('');
+      // this.tokens.push(variable);
+      // this.input = this.tokens.join('');
+      this.notifyService.showWarning('Prefixed it with Function!');
       return;
     }
 
-    const regex = new RegExp(/[A-Za-z0-9\.\]\)]/);
-    if (!regex.test(this.PreviousChar())) {
-      this.input = this.input + variable;
+    // const regex = new RegExp(/[A-Za-z0-9\.\]\)]/);
+    // if (!regex.test(this.PreviousChar())) {
+    //   this.input = this.input + variable;
+    //   this.tokens.push(variable);
+    //   this.scrollfix();
+    // } else {
+    //   this.notifyService.showWarning('Missing arithmetic operator or parenthesis!');
+    // }
+    if (this.tokens[this.tokens.length - 1] === 'SumOf(' || this.tokens[this.tokens.length - 1] === 'AvgOf(' || this.tokens[this.tokens.length - 1] === 'MinOf(' ||this.tokens[this.tokens.length - 1] === 'MaxOf(') {
+      variable = variable + ')'
       this.tokens.push(variable);
-      this.scrollfix();
+      this.input = this.tokens.join('');
     } else {
-      this.notifyService.showWarning('Missing arithmetic operator or parenthesis!');
+      this.notifyService.showWarning('Prefixed it with Function!');
     }
   }
 
