@@ -7,9 +7,10 @@
 <ng-template #mymodal let-modal>
   <div class="modal-header">
     <h4 class="modal-title" id="modal-basic-title">Calculator</h4>
-    <button type="button" class="close btn-close" aria-label="Close" (click)="modal.dismiss('Cross click'); closeToastr();"></button>
+    <button type="button" class="close btn-close" aria-label="Close"
+      (click)="modal.dismiss('Cross click'); closeToastr();"></button>
   </div>
-    <app-calculator-modal [formulaArr]="formulaArr"></app-calculator-modal>
+  <app-calculator-modal [formulaArr]="formulaArr"></app-calculator-modal>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="modal.close('Cancel click'); closeToastr();">
       Cancel
@@ -48,8 +49,18 @@
     </ng-container>
   </div>
   <div class="row">
-    <div class="col-3 mt-3 ms-auto">
-      <button type="submit" class="btn btn-primary">Apply</button>
+    <div class="col-2 ms-auto">
+      <label for="sdate" class="col-form-label pt-0">Start Frame</label>
+      <input id="sdate" class="form-control p-1" type="datetime-local" [(ngModel)]="startDateTime" name="sdate"
+        [ngModelOptions]="{standalone: true}" [max]="endDateTime" [disabled]="isApply" />
+    </div>
+    <div class="col-2">
+      <label for="edate" class="col-form-label pt-0">End Frame</label>
+      <input id="edate" class="form-control p-1" type="datetime-local" [(ngModel)]="endDateTime" name="edate"
+        [ngModelOptions]="{standalone: true}" [max]="endDateTime" [disabled]="isApply" />
+    </div>
+    <div class="col-2 mt-5">
+      <button type="submit" class="btn btn-primary" [disabled]="isApply" >Apply</button>
     </div>
   </div>
 </form>

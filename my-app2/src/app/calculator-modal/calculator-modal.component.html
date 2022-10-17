@@ -135,11 +135,11 @@
       <div class="row form-group">
         <div class="col-6">
           <label for="sdate" class="col-form-label pt-0">Start Frame</label>
-          <input id="sdate" class="form-control p-1" [(ngModel)]="startDateTime" type="datetime-local" />
+          <input id="sdate" class="form-control p-1" [(ngModel)]="startDateTime" type="datetime-local" [max]="endDateTime" />
         </div>
         <div class="col-6">
           <label for="edate" class="col-form-label pt-0">End Frame</label>
-          <input id="edate" class="form-control p-1" [(ngModel)]="endDateTime" type="datetime-local" />
+            <input id="edate" class="form-control p-1" [(ngModel)]="endDateTime" type="datetime-local" [max]="endDateTime" />
         </div>
       </div>
       <div class="row mt-3">

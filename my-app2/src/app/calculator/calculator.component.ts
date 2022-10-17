@@ -9,6 +9,10 @@ import { NotificationService } from '../Services/notification.service';
 
 interface Formulas {
   FormulaName: string[];
+  LineId: string;
+  MachineId: string;
+  StartDate: string;
+  EndDate: string;
 }
 
 @Component({
@@ -57,7 +61,9 @@ export class CalculatorComponent implements OnInit {
   title = 'appBootstrap';
   closeResult = '';
   isEditOn = false;
-
+  isApply = true;
+  startDateTime: any;
+  endDateTime: any;
   form: FormGroup;
   selectedFormula: any;
   data: Formulas = {} as Formulas;
@@ -116,6 +122,11 @@ export class CalculatorComponent implements OnInit {
       const index = this.selectedFormula.controls.findIndex((x: { value: any; }) => x.value === event.target.value);
       this.selectedFormula.removeAt(index);
     }
+    if (this.selectedFormula.length < 1) {
+      this.isApply = true;
+    } else {
+      this.isApply = false;
+    }
   }
 
   constructor(
@@ -124,17 +135,24 @@ export class CalculatorComponent implements OnInit {
     private getTSIService: GetTSIService,
     private notifyService: NotificationService) {
     this.form = fb.group({
-      FormulaName: new FormArray([])
+      FormulaName: new FormArray([]),
     });
   }
 
+
   submit = (): void => {
-    this.data = { FormulaName: ['Average'] };
+    this.data = {
+      FormulaName: ['Average'],
+      LineId: 'Line03',
+      MachineId: 'chocolateSupply',
+      StartDate: new Date(this.startDateTime).toISOString(),
+      EndDate: new Date(this.endDateTime).toISOString(),
+    };
     // console.log(this.selectedFormula);
     // this.selectedFormula.value.forEach((str: string) => {
     //   data.FormulaName.push(str);
     // })
-
+    console.warn(this.form);
     this.getTSIService.selectedFormulaApi(this.data).subscribe((result) => {
       const value = result;
       if (result) {
@@ -142,7 +160,11 @@ export class CalculatorComponent implements OnInit {
       }
     });
   }
-  ngOnInit(): void {}
+
+  ngOnInit(): void {
+    this.startDateTime = new Date(new Date().getTime() - (24 * 60 * 60 * 1000) + (5.5 * 60 * 60 * 1000)).toISOString().slice(0, 16);
+    this.endDateTime = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)).toISOString().slice(0, 16);
+    console.warn(new Date(this.startDateTime).toISOString());
+  }
 
 }
-

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbModal, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AvaliFunc } from '../interfaces/avaliFunc';
 import { AvaliVar } from '../interfaces/avaliVar';
 import { Formula } from '../interfaces/formula';
@@ -94,18 +94,21 @@ export class CalculatorModalComponent implements OnInit {
     ) {}
 
   ngOnInit(): void {
+    this.startDateTime = new Date(new Date().getTime() - (24 * 60 * 60 * 1000) + (5.5 * 60 * 60 * 1000)).toISOString().slice(0, 16);
+    this.endDateTime = new Date(new Date().getTime() + (5.5 * 60 * 60 * 1000)).toISOString().slice(0, 16);
+
     this.getTSIService.getTSI().subscribe(
       (Response: any) => {
         Response.forEach((data: any) => {
           this.varArr.push({name: data});
        });
       });
-      if (this.isEditOn) {
-        this.input = this.FormulaObject.Formula;
-        this.formulaName = this.FormulaObject.FormulaName;
-        this.tokens = this.FormulaObject.FormulaTokens;
-        this.isFormulaName = true;
-      }
+    if (this.isEditOn) {
+      this.input = this.FormulaObject.Formula;
+      this.formulaName = this.FormulaObject.FormulaName;
+      this.tokens = this.FormulaObject.FormulaTokens;
+      this.isFormulaName = true;
+    }
   }
 
   scrollfix = () => {
@@ -221,7 +224,7 @@ export class CalculatorModalComponent implements OnInit {
     if (this.input.length === 0) {
       // this.tokens.push(variable);
       // this.input = this.tokens.join('');
-      this.notifyService.showWarning('Prefixed it with Function!');
+      this.notifyService.showWarning('Prefixed it with either SumOf, AvgOf, MinOf, MaxOf Function!');
       return;
     }
 
@@ -233,12 +236,15 @@ export class CalculatorModalComponent implements OnInit {
     // } else {
     //   this.notifyService.showWarning('Missing arithmetic operator or parenthesis!');
     // }
-    if (this.tokens[this.tokens.length - 1] === 'SumOf(' || this.tokens[this.tokens.length - 1] === 'AvgOf(' || this.tokens[this.tokens.length - 1] === 'MinOf(' ||this.tokens[this.tokens.length - 1] === 'MaxOf(') {
-      variable = variable + ')'
+    if (this.tokens[this.tokens.length - 1] === 'SumOf(' ||
+     this.tokens[this.tokens.length - 1] === 'AvgOf(' ||
+      this.tokens[this.tokens.length - 1] === 'MinOf(' ||
+      this.tokens[this.tokens.length - 1] === 'MaxOf(') {
+      variable = variable + ')';
       this.tokens.push(variable);
       this.input = this.tokens.join('');
     } else {
-      this.notifyService.showWarning('Prefixed it with Function!');
+      this.notifyService.showWarning('Prefixed it with either SumOf, AvgOf, MinOf, MaxOf Function!');
     }
   }
 
@@ -412,7 +418,13 @@ export class CalculatorModalComponent implements OnInit {
 
   // Apply Button
   getResult = (): void => {
-    const data = { FormulaName: ['Average'] };
+    const data = {
+      FormulaName: ['Average'],
+      LineId: 'Line03',
+      MachineId: 'chocolateSupply',
+      StartDate: new Date(this.startDateTime).toISOString(),
+      EndDate: new Date(this.endDateTime).toISOString(),
+    };
     $('.calculator').find('button').attr('disabled', 'disabled');
     this.getTSIService.selectedFormulaApi(data).subscribe((result) => {
       const value = result;
