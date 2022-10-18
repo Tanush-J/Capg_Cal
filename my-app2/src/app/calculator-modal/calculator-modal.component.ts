@@ -6,7 +6,7 @@ import { Formula } from '../interfaces/formula';
 import { GetTSIService } from '../Services/get-tsi.service';
 import { NotificationService } from '../Services/notification.service';
 import { SyntaxValidationService } from '../Services/syntax-validation.service';
-import { isFunc } from './validation';
+import { isFunc, isVar } from './validation';
 import * as $ from 'jquery';
 
 @Component({
@@ -24,6 +24,9 @@ export class CalculatorModalComponent implements OnInit {
   radian = '/(360*2*PI)';
   isFormulaName = false;
   isSave = false;
+  openPCount = 0;
+  closePCount = 0;
+  isFunctionOn = false;
 
   funcArr: AvaliFunc[] = [
     {
@@ -132,14 +135,35 @@ export class CalculatorModalComponent implements OnInit {
     this.tokens = [];
     this.isParsingDone = false;
     this.isSave = false;
+    this.openPCount = 0;
+    this.closePCount = 0;
+    this.isFunctionOn = false;
+    this.isDotUsed = false;
   }
 
   // Erase last input character
   Delete = () => {
     this.isParsingDone = false;
+    const lastToken = this.tokens[this.tokens.length - 1];
     if (this.tokens.length === 0) {
       return;
     } else {
+      if (lastToken === '(') {
+        this.openPCount = this.openPCount - 1;
+      } else if (lastToken === ')') {
+        this.closePCount = this.closePCount - 1;
+      } else if (lastToken === 'SumOf(' ||
+        lastToken === 'AvgOf(' ||
+        lastToken === 'Min' ||
+        lastToken === 'Max') {
+          this.isFunctionOn = false;
+      } else if (isFunc(this.funcArr, lastToken)) {
+        this.openPCount = this.openPCount - 1;
+      } else if (isVar(this.varArr, lastToken)) {
+        this.isFunctionOn = true;
+      } else if (/\./.test(lastToken)) {
+        this.isDotUsed = false;
+      }
       this.tokens.pop();
       this.input = this.tokens.join('');
     }
@@ -148,6 +172,10 @@ export class CalculatorModalComponent implements OnInit {
 
   // Function For NUmbers
   Numbers = (num: string) => {
+    if (this.isFunctionOn === true) {
+      this.notifyService.showWarning('Invalid parameter');
+      return;
+    }
     if (this.tokens.length === 0) {
       this.tokens.push(num);
       this.input = this.tokens.join('');
@@ -172,8 +200,8 @@ export class CalculatorModalComponent implements OnInit {
 
   // Function For Operators
   Operators = (op: string): void => {
-    if (this.tokens.length === 0) {
-      this.notifyService.showWarning('Add variables and functions to perform operation');
+    if (this.tokens.length === 0 || this.isFunctionOn === true) {
+      this.notifyService.showWarning('Add parameter or functions to perform operation');
       return;
     }
     if (this.PreviousChar() === '.') {
@@ -227,22 +255,14 @@ export class CalculatorModalComponent implements OnInit {
       this.notifyService.showWarning('Prefixed it with either SumOf, AvgOf, MinOf, MaxOf Function!');
       return;
     }
-
-    // const regex = new RegExp(/[A-Za-z0-9\.\]\)]/);
-    // if (!regex.test(this.PreviousChar())) {
-    //   this.input = this.input + variable;
-    //   this.tokens.push(variable);
-    //   this.scrollfix();
-    // } else {
-    //   this.notifyService.showWarning('Missing arithmetic operator or parenthesis!');
-    // }
     if (this.tokens[this.tokens.length - 1] === 'SumOf(' ||
      this.tokens[this.tokens.length - 1] === 'AvgOf(' ||
-      this.tokens[this.tokens.length - 1] === 'MinOf(' ||
-      this.tokens[this.tokens.length - 1] === 'MaxOf(') {
+      this.tokens[this.tokens.length - 1] === 'Min(' ||
+      this.tokens[this.tokens.length - 1] === 'Max(') {
       variable = variable + ')';
       this.tokens.push(variable);
       this.input = this.tokens.join('');
+      this.isFunctionOn = false;
     } else {
       this.notifyService.showWarning('Prefixed it with either SumOf, AvgOf, MinOf, MaxOf Function!');
     }
@@ -254,6 +274,7 @@ export class CalculatorModalComponent implements OnInit {
       if (this.input.length === 0) {
         this.input = this.input + sym;
         this.tokens.push(sym);
+        this.openPCount = this.openPCount + 1;
         return;
       }
 
@@ -264,18 +285,20 @@ export class CalculatorModalComponent implements OnInit {
       } else {
         this.input = this.input + sym;
         this.tokens.push(sym);
+        this.openPCount = this.openPCount + 1;
         this.scrollfix();
       }
     }
 
     if (sym === ')') {
       const regex = new RegExp(/[/(/[,\+\-\*\/]/);
-      if (this.input.length === 0 || regex.test(this.PreviousChar())) {
+      if (this.input.length === 0 || regex.test(this.PreviousChar()) || this.openPCount <= this.closePCount) {
         this.notifyService.showWarning('Invalid Expression');
         return;
       } else {
         this.input = this.input + sym;
         this.tokens.push(sym);
+        this.closePCount = this.closePCount + 1;
         this.scrollfix();
       }
     }
@@ -284,15 +307,24 @@ export class CalculatorModalComponent implements OnInit {
   // Special Functions
   specialFunctions = (func: string): void => {
     this.isParsingDone = false;
+    if (this.isFunctionOn === true) {
+      this.notifyService.showWarning('Invalid parameter!');
+      return;
+    } else if (func === 'SumOf(' || func === 'AvgOf(' || func === 'Min(' || func === 'Max(') {
+      this.isFunctionOn = true;
+      this.openPCount = this.openPCount - 1;
+    }
     if (this.input.length === 0) {
       this.input = this.input + func;
       this.tokens.push(func);
+      this.openPCount = this.openPCount + 1;
       return;
     }
     const regex = new RegExp(/[A-Za-z0-9\.\)\]]/);
     if (!regex.test(this.PreviousChar())) {
-      this.input = this.input + func;
       this.tokens.push(func);
+      this.input = this.tokens.join('');
+      this.openPCount = this.openPCount + 1;
     } else {
       this.notifyService.showWarning('Missing arithmetic operator!');
     }

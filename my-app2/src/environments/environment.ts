@@ -4,10 +4,11 @@
 
 export const environment = {
   production: false,
+  READFORMULAPI: 'https://dynamickpi.azurewebsites.net/api/ReadFormula',
   WRITEFORMULAPI: 'https://dynamickpitesting.azurewebsites.net/api/WriteFormula?code=vsJFbac0eTcnsZODGbe68zVGb2KcdoS7eltrrsj7Op4bAzFuLTMUWg==',
   GETTSIVALUESAPI: 'https://dynamickpitesting.azurewebsites.net/api/MachineParameters?code=Ip7cZzYY1SfvjLU80UCCbW6PjB5RNCo3EN7fz_EblaIpAzFusRernQ==',
   APPLYAPI: 'https://dynamickpicalculation.azurewebsites.net/api/Calculation?code=z6L3fjjAP-Re6q6MUejUDKOoNJzQbY5jhns-SKhkV_bOAzFukhaaQQ==',
-  // GETTSIVALUESAPI: 'https://functionadx.azurewebsites.net/api/adxfetch'
+  DELETEFORMULAAPI: 'https://dynamickpi.azurewebsites.net/api/DeleteFormula?code=_zeSkyd1QpruyEDXXJZtvV5XuYfap_lFjPonXSS89mUCAzFuY9udrg==',
 };
 
 /*
